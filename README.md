@@ -5,7 +5,7 @@ Small local editor for Label Studio JSON exports. It lists JSON fixtures, shows 
 From this directory:
 
 ```bash
-python server.py
+python app.py
 ```
 
 Then open <http://127.0.0.1:8765>.
