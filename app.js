@@ -26,7 +26,7 @@ function noteText() {
 }
 function setStatus(text, error = false) {
   $("save-status").textContent = text;
-  $("save-status").style.color = error ? "#ffb5aa" : "#c9d4dc";
+  $("save-status").style.color = error ? "#ffb5aa" : "rgb(51, 66, 77)";
 }
 
 function renderFiles() {
@@ -48,12 +48,31 @@ function renderFiles() {
 
 function renderNote() {
   const record = currentRecord();
-  if (!record) return;
+  if (!record) {
+    $("current-file").textContent = state.file || "Choose a fixture";
+    $("note-position").textContent = "No notes in this file";
+    $("note-title").textContent = "No note selected";
+    $("note-id").textContent = "";
+    $("annotation-count").textContent = "0";
+    $("note-text").textContent = "";
+    $("annotation-list").innerHTML = "";
+    $("editor").className = "editor empty";
+    $("editor").textContent = "This file has no notes.";
+    $("prev-note").disabled = true;
+    $("next-note").disabled = true;
+    $("delete-note").disabled = true;
+    $("add-selection").disabled = true;
+    $("selection-info").textContent = "Select text to add an annotation.";
+    return;
+  }
   $("current-file").textContent = state.file;
   $("note-position").textContent =
     `Note ${state.noteIndex + 1} of ${state.records.length}`;
   $("note-title").textContent = `Annotation note`;
   $("note-id").textContent = `ID ${record.id ?? "—"}`;
+  $("prev-note").disabled = state.noteIndex === 0;
+  $("next-note").disabled = state.noteIndex + 1 >= state.records.length;
+  $("delete-note").disabled = false;
   $("annotation-count").textContent = annotations().length;
   const spans = annotations()
     .map((a, index) => ({ ...a.value, index }))
@@ -143,6 +162,37 @@ function removeAnnotation() {
   state.selected = null;
   saveFile();
 }
+async function deleteNote() {
+  const record = currentRecord();
+  if (!record) return;
+  const noteId = record.id ?? "unknown";
+  if (
+    !window.confirm(
+      "Delete note " +
+      noteId +
+      " from " +
+      state.file +
+      "? This removes it from the JSON file.",
+    )
+  )
+    return;
+
+  const deletedIndex = state.noteIndex;
+  const [deletedRecord] = state.records.splice(deletedIndex, 1);
+  state.noteIndex = state.records.length
+    ? Math.min(deletedIndex, state.records.length - 1)
+    : 0;
+  state.selected = null;
+
+  if (await saveFile()) {
+    setStatus("Deleted note " + noteId);
+    return;
+  }
+
+  state.records.splice(deletedIndex, 0, deletedRecord);
+  state.noteIndex = deletedIndex;
+  renderNote();
+}
 function addSelection() {
   if (!state.selection) return;
   const [start, end] = state.selection;
@@ -170,8 +220,10 @@ async function saveFile() {
     });
     setStatus("Saved");
     renderNote();
+    return true;
   } catch (error) {
     setStatus(error.message, true);
+    return false;
   }
 }
 async function loadFile(path) {
@@ -223,6 +275,7 @@ $("note-text").addEventListener("mouseup", () => {
   $("add-selection").disabled = false;
 });
 $("add-selection").addEventListener("click", addSelection);
+$("delete-note").addEventListener("click", deleteNote);
 $("prev-note").addEventListener("click", () => {
   if (state.noteIndex > 0) {
     state.noteIndex--;
