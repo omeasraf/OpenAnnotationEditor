@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Open Annotation Editor</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div><span class="eyebrow">OPEN</span><h1>Annotation editor</h1></div>
+      <div id="save-status" class="save-status">Loading…</div>
+    </header>
+    <main class="shell">
+      <aside class="sidebar panel">
+        <div class="panel-heading"><span>Fixtures</span><span id="file-count" class="count"></span></div>
+        <div id="file-list" class="file-list"></div>
+      </aside>
+      <section class="workspace">
+        <div class="toolbar panel">
+          <div><span id="current-file" class="path-label">Choose a fixture</span><span id="note-position" class="muted"></span></div>
+          <div class="toolbar-actions"><input id="note-id-input" class="note-id-input" placeholder="Note ID" inputmode="numeric"><button id="jump-note">Jump</button><button id="prev-note">← Previous</button><button id="next-note">Next →</button></div>
+        </div>
+        <div class="note-layout">
+          <article class="note-panel panel">
+            <div class="note-heading"><div><span class="eyebrow">NOTE</span><h2 id="note-title">No note selected</h2></div><span id="note-id" class="badge"></span></div>
+            <div id="note-text" class="note-text" tabindex="0"></div>
+            <div class="selection-bar"><span id="selection-info">Select text to add an annotation.</span><button id="add-selection" disabled>Add selected text</button></div>
+          </article>
+          <aside class="inspector panel">
+            <div class="panel-heading"><span>Annotations</span><span id="annotation-count" class="count"></span></div>
+            <div id="annotation-list" class="annotation-list"></div>
+            <div id="editor" class="editor empty">Select an annotation or select text in the note.</div>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
